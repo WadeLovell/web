@@ -44,6 +44,7 @@ module.exports = {
 
 	UPDATE_REMIND_AFTER: 60 * 3 * 1000,
 	UPDATE_PULL_INTERVAL: 30000,
+	COMPOSE_AUTO_SAVE_INTERVAL: 15000,
 
 	// what, why? because reasons ^^
 	stripBOM: (str) => str.replace(/^\ufeff/g, '')

@@ -102,12 +102,16 @@ module.exports = function($q, $rootScope, $timeout,
 
 		const r = labels.reduce((a, labelOpts) => {
 			const label = new Label(labelOpts);
-			if (label.name == 'Drafts')
-				return a;
-
 			a.byName[label.name] = a.byId[label.id] = label;
 			return a;
-		}, {byName: {}, byId: {}, list: []});
+		}, {byName: {}, byId: {}});
+
+		r.byName.Drafts = r.byId[-1] = new Label({
+			id: -1,
+			name: 'Drafts',
+			emails_total: 0,
+			builtin: true
+		});
 
 		r.list = consts.ORDERED_LABELS.map(labelName => r.byName[labelName]).filter(e => !!e);
 
@@ -119,11 +123,6 @@ module.exports = function($q, $rootScope, $timeout,
 	this.initialize = () => co(function *(){
 		const info = yield LavaboomAPI.info();
 		console.log('info', info);
-
-		const labels = yield self.getLabels();
-
-		/*if (!labels.byName.Drafts)
-			yield self.createLabel('Drafts');*/
 	});
 
 	this.createLabel = (name) => co(function *(){
@@ -157,6 +156,17 @@ module.exports = function($q, $rootScope, $timeout,
 	});
 
 	this.requestList = (labelName, offset, limit) => co(function *() {
+		if (labelName == 'Drafts') {
+			const files = (yield LavaboomAPI.files.list({
+				sort: sortQuery,
+				offset: offset,
+				limit: limit
+			})).body.files;
+			console.log(files);
+
+			return [];
+		}
+
 		const labels = yield self.getLabels();
 		const requestLabels = [labels.byName[labelName].id];
 

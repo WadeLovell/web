@@ -192,6 +192,14 @@ module.exports = ($rootScope, $scope, $stateParams, $translate,
 					};
 				}
 
+				composeHelpers.autoSave(() => ({
+					to: $scope.form.selected.to,
+					cc: $scope.form.selected.cc,
+					bcc: $scope.form.selected.bcc,
+					subject: $scope.form.subject,
+					body: $scope.form.body
+				}));
+
 				console.log('$scope.form', $scope.form);
 			});
 		});
@@ -293,11 +301,7 @@ module.exports = ($rootScope, $scope, $stateParams, $translate,
 				cc = $scope.form.selected.cc.map(e => e.email),
 				bcc = $scope.form.selected.bcc.map(e => e.email);
 
-			let keys = yield ([...$scope.form.selected.to, ...$scope.form.selected.cc, ...$scope.form.selected.bcc].reduce((a, e) => {
-				a[e.email] = co.transform(co.def(e.loadKey(), null), e => e ? e.armor() : null);
-				return a;
-			}, {}));
-
+			let keys = composeHelpers.getKeys($scope.form.selected.to, $scope.form.selected.cc, $scope.form.selected.bcc);
 			const isSecured = Email.isSecuredKeys(keys);
 
 			yield $scope.attachments.map(attachmentStatus => $scope.uploadAttachment(attachmentStatus, keys));

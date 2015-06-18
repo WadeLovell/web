@@ -372,6 +372,8 @@ module.exports = function($q, $rootScope, $injector, consts, co, utils, helpers,
 		};
 	});
 
+	this.messageToBinary = (message) => openpgp.message.readArmored(message).packets.write();
+
 	this.removeAllKeys = () => {
 		storage.clearAllKeys();
 	};
